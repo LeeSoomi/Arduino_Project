@@ -1,25 +1,21 @@
 int led = 13;       
-int flame = 5;      
-int state = 0;      
- 
+int flamePin = 5;           
+int Flame = 1 ; 
+
 void setup() {
   pinMode(led, OUTPUT);    
-  pinMode(flame, INPUT);   
+  pinMode(flamePin, INPUT);   
   Serial.begin(9600);      
 }
  
 void loop() {
-  state = digitalRead(flame);  
-  digitalWrite(led, LOW);      
- 
-  if (state == 1){              
-    Serial.println("ON");       
-    digitalWrite(led, HIGH);    
-    delay(100);                
+  Flame = digitalRead(flamePin);
+  if (Flame== 0){
+    Serial.println("Fire!!!");
+    digitalWrite(led, HIGH);
   }
-  else {                           
-    Serial.println("OFF");     
-    digitalWrite(led, LOW);     
+  else{
+    Serial.println("No worries");
+    digitalWrite(led, LOW);
   }
-  delay(100);
 }
