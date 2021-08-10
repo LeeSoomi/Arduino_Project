@@ -1,28 +1,23 @@
-#define trigPin 13                 
-#define echoPin 12  
-           
-void setup( ) {
-  Serial.begin (9600);             
-  pinMode(trigPin, OUTPUT); 
-  pinMode(echoPin, INPUT);   
+int echo = 12;
+int trig = 13;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(trig, OUTPUT);
+  pinMode(echo, INPUT);
 }
 
-void loop( ) {
-  long duration, distance;                  
-  digitalWrite(trigPin, LOW);                 
-  delayMicroseconds(2);                   
-  digitalWrite(trigPin, HIGH);               
-  delayMicroseconds(10);                 
-  digitalWrite(trigPin, LOW);                
-  duration = pulseIn(echoPin, HIGH);   
-  distance = duration * 17 / 1000;          
-
-  if (distance >= 200 || distance <= 0) {
-    Serial.println("거리를 측정할 수 없음");   
-  }
-  else {
-    Serial.print(distance) ;                        
-    Serial.println(" cm") ;                                                                                    
-  }
-  delay(500);                                         
+void loop() {
+    digitalWrite(trig, LOW);
+    digitalWrite(echo, LOW);
+    delayMicroseconds(2);
+    digitalWrite(trig, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trig, LOW);
+    
+    unsigned long duration = pulseIn(echo, HIGH); 
+    float distance = ((float)(340 * duration) / 10000) / 2;    
+    Serial.print(distance);
+    Serial.println("cm");
+    delay(500);
 }
