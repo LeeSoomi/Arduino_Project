@@ -19,3 +19,9 @@ void loop(){
     digitalWrite(ledPin, LOW); 
   }
 }
+
+long TP_init(){
+  delay(10);
+  long measurement=pulseIn (EP, HIGH); 
+  return measurement;
+}
