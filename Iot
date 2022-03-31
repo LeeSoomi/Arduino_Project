@@ -56,7 +56,7 @@ void loop() {
 void onLedChange()  {
   // Add your code here to act upon Led change
   Serial.println(led);
-  if(led == True){
+  if(led){
     digitalWrite(LED, HIGH);
   }
   else {
