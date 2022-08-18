@@ -49,4 +49,5 @@ void right(){
 
 
 void loop ( )  {
+foward();
 }
