@@ -1,0 +1,70 @@
+
+int trig = 12;
+int echo = 11;
+
+int motorA1 =  5; 
+int motorA2  = 6; 
+int motorB1 =  9; 
+int motorB2 =  10; 
+int  sp = 150 ;   // speed :  0 ~ 255
+
+void setup ( ) {  
+  pinMode( motorA1 , OUTPUT); 
+  pinMode( motorA2 , OUTPUT); 
+  pinMode( motorB1 , OUTPUT); 
+  pinMode( motorB2 , OUTPUT);
+  pinMode(trig, OUTPUT); 
+  pinMode(echo, INPUT);   
+}
+
+void foward(){
+  analogWrite( motorA1 , sp); 
+  analogWrite( motorA2 , 0); 
+  analogWrite( motorB1 , sp); 
+  analogWrite( motorB2 , 0);  
+}
+
+void back(){
+  analogWrite( motorA1 , 0);
+  analogWrite( motorA2 , sp);
+  analogWrite( motorB1 , 0);
+  analogWrite( motorB2 , sp);
+}
+
+void st(){
+  digitalWrite( motorA1 , 0); 
+  digitalWrite( motorA2 , 0); 
+  digitalWrite( motorB1 , 0); 
+  digitalWrite( motorB2 , 0);  
+}
+
+
+void left(){
+  analogWrite( motorA1 , sp);
+  analogWrite( motorA2 , 0);
+  analogWrite( motorB1 , 0);
+  analogWrite( motorB2 , sp); 
+}
+
+void right(){
+  analogWrite( motorA1 , 0);
+  analogWrite( motorA2 , sp);
+  analogWrite( motorB1 , sp);
+  analogWrite( motorB2 , 0);
+}
+
+
+void loop ( )  {
+  digitalWrite(trig, LOW);
+  digitalWrite(echo, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trig, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trig, LOW);
+
+  unsigned long duration = pulseIn(echo, HIGH); 
+  float distance = ((float)(340 * duration) / 10000) / 2;  
+  
+  Serial.print(distance);
+  Serial.println("cm");
+}
