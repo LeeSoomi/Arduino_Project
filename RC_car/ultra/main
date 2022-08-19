@@ -19,10 +19,10 @@ void setup ( ) {
 }
 
 void foward(){
-  analogWrite( motorA1 , HIGH); 
-  analogWrite( motorA2 , 0); 
-  analogWrite( motorB1 , HIGH); 
-  analogWrite( motorB2 , 0);  
+  digitalWrite( motorA1 , HIGH); 
+  digitalWrite( motorA2 , 0); 
+  digitalWrite( motorB1 , 0); 
+  digitalWrite( motorB2 , HIGH);  
 }
 
 void back(){
