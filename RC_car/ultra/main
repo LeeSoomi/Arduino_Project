@@ -18,39 +18,33 @@ void setup ( ) {
 }
 
 void foward(){
-  analogWrite( motorA1 , sp); 
+  analogWrite( motorA1 , HIGH); 
   analogWrite( motorA2 , 0); 
-  analogWrite( motorB1 , sp); 
+  analogWrite( motorB1 , HIGH); 
   analogWrite( motorB2 , 0);  
 }
 
 void back(){
-  analogWrite( motorA1 , 0);
-  analogWrite( motorA2 , sp);
-  analogWrite( motorB1 , 0);
-  analogWrite( motorB2 , sp);
+  
+  
+  
 }
 
 void st(){
-  digitalWrite( motorA1 , 0); 
-  digitalWrite( motorA2 , 0); 
-  digitalWrite( motorB1 , 0); 
-  digitalWrite( motorB2 , 0);  
+
+
+
 }
 
 
 void left(){
-  analogWrite( motorA1 , sp);
-  analogWrite( motorA2 , 0);
-  analogWrite( motorB1 , 0);
-  analogWrite( motorB2 , sp); 
+ 
+ 
+ 
 }
 
 void right(){
-  analogWrite( motorA1 , 0);
-  analogWrite( motorA2 , sp);
-  analogWrite( motorB1 , sp);
-  analogWrite( motorB2 , 0);
+  
 }
 
 
@@ -67,4 +61,8 @@ void loop ( )  {
   
   Serial.print(distance);
   Serial.println("cm");
+  
+ 
+ foward();
+  
 }
