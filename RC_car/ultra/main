@@ -74,7 +74,7 @@ void loop ( ){
     left();
   }
   else if (distance >= 15){
-    forward();
+    foward() ;
   }
   delay(5);
 }
