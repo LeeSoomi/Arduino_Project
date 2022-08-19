@@ -6,7 +6,7 @@ int motorA1 =  5;
 int motorA2  = 6; 
 int motorB1 =  9; 
 int motorB2 =  10; 
-int  sp = 150 ;   // speed :  0 ~ 255
+
 
 void setup ( ) {  
   pinMode( motorA1 , OUTPUT); 
