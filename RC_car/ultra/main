@@ -63,7 +63,19 @@ void loop ( )  {
   Serial.print(distance);
   Serial.println("cm");
   
+ if (distance <= 15) {
+   st();
+   delay(100) ;
+   back() ;
+   delay(500) ;  
+   left() ;
+   delay(500) ;   
+   
+ }
  
- foward();
+ else {
+  foward();
+}
+
   
 }
