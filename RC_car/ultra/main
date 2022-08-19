@@ -26,26 +26,38 @@ void foward(){
 }
 
 void back(){
-  
+  digitalWrite( motorA1 , 0); 
+  digitalWrite( motorA2 , HIGH); 
+  digitalWrite( motorB1 , HIGH); 
+  digitalWrite( motorB2 , 0);  
   
   
 }
 
 void st(){
-
+  digitalWrite( motorA1 , 0); 
+  digitalWrite( motorA2 , 0); 
+  digitalWrite( motorB1 , 0); 
+  digitalWrite( motorB2 , 0); 
 
 
 }
 
 
 void left(){
- 
+  digitalWrite( motorA1 , 0); 
+  digitalWrite( motorA2 , HIGH); 
+  digitalWrite( motorB1 , 0); 
+  digitalWrite( motorB2 , HIGH);  
  
  
 }
 
 void right(){
-  
+   digitalWrite( motorA1 , HIGH); 
+  digitalWrite( motorA2 , 0); 
+  digitalWrite( motorB1 , HIGH); 
+  digitalWrite( motorB2 , 0); 
 }
 
 
