@@ -1,0 +1,17 @@
+https://randomnerdtutorials.com/esp32-cam-ai-thinker-pinout/
+
+# Installing the ESP32 Add-on on Arduino IDE
+
+1) Arduino IDE에서 환경 설정 창을 엽니다. 아두이노  > 기본 설정 으로 이동
+
+2) 아래 그림과 같이 “Additional Board Manager URLs” 필드에  
+https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json 을 입력합니다.
+그런 다음 "확인" 버튼을 클릭합니다.
+
+참고: 이미 ESP8266 보드 URL이 있는 경우 다음과 같이 URL을 쉼표로 구분할 수 있습니다.
+
+https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json, 
+http://arduino.esp8266.com/stable/package_esp8266com_index.json
+
+3) 게시판 관리자를 엽니다. 도구 > 보드 > 보드 관리자… 로 이동합니다 .
+4) ESP32를 검색하고 " ESP32 by Espressif Systems " 설치 버튼을 누릅니다.
