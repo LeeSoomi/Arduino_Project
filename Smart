@@ -1,0 +1,123 @@
+#include "thingProperties.h"
+#include <DHT.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+#include <Adafruit_NeoPixel.h>
+
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+#define OLED_RESET -1
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+
+#define LIGHT_SENSOR_PIN A0
+#define SOIL_SENSOR_PIN A1
+#define DHT_PIN 2
+#define DHT_TYPE DHT11
+
+#define NEOPIXEL_PIN 6
+#define NUMPIXELS 1
+
+#define PUMP_PIN 3
+#define FAN_PIN 4
+
+DHT dht(DHT_PIN, DHT_TYPE);
+Adafruit_NeoPixel pixels(NUMPIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
+
+void setup() {
+  Serial.begin(9600);
+  initProperties();
+
+  pinMode(LIGHT_SENSOR_PIN, INPUT);
+  pinMode(SOIL_SENSOR_PIN, INPUT);
+  pinMode(PUMP_PIN, OUTPUT);
+  pinMode(FAN_PIN, OUTPUT);
+
+  dht.begin();
+  pixels.begin();
+  pixels.show(); // Initialize all pixels to 'off'
+  
+  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+    Serial.println(F("SSD1306 allocation failed"));
+    for(;;);
+  }
+  display.display();
+  delay(2000);
+  display.clearDisplay();
+  
+  ArduinoCloud.begin(ArduinoIoTPreferredConnection);
+  setDebugMessageLevel(2);
+  ArduinoCloud.printDebugInfo();
+}
+
+void loop() {
+  ArduinoCloud.update();
+  
+  int lightLevel = analogRead(LIGHT_SENSOR_PIN);
+  int soilMoisture = analogRead(SOIL_SENSOR_PIN);
+  float temperature = dht.readTemperature();
+  float humidity = dht.readHumidity();
+  
+  light_level = lightLevel;
+  soil_moisture = soilMoisture;
+  temperature = temperature;
+  humidity = humidity;
+  
+  controlNeoPixel(lightLevel);
+  controlPump(soilMoisture);
+  controlFan(temperature);
+  
+  displaySensorData(lightLevel, soilMoisture, temperature, humidity);
+}
+
+void controlNeoPixel(int lightLevel) {
+  if (lightLevel < 500) {
+    // Set to growth light spectrum: mostly red with some blue
+    pixels.setPixelColor(0, pixels.Color(255, 0, 255)); // Purple (Red + Blue)
+  } else {
+    pixels.setPixelColor(0, pixels.Color(0, 0, 0)); // Turn off if light level is sufficient
+  }
+  pixels.show();
+}
+
+void controlPump(int soilMoisture) {
+  if (soilMoisture < 300) {
+    digitalWrite(PUMP_PIN, HIGH);
+  } else {
+    digitalWrite(PUMP_PIN, LOW);
+  }
+}
+
+void controlFan(float temperature) {
+  if (temperature > 25.0) {
+    digitalWrite(FAN_PIN, HIGH);
+  } else {
+    digitalWrite(FAN_PIN, LOW);
+  }
+}
+
+void displaySensorData(int light, int soil, float temp, float hum) {
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  
+  display.setCursor(0, 0);
+  display.print("Light Level: ");
+  display.print(light);
+  
+  display.setCursor(0, 10);
+  display.print("Soil Moisture: ");
+  display.print(soil);
+  
+  display.setCursor(0, 20);
+  display.print("Temperature: ");
+  display.print(temp);
+  display.print(" C");
+  
+  display.setCursor(0, 30);
+  display.print("Humidity: ");
+  display.print(hum);
+  display.print(" %");
+
+  display.display();
+}
