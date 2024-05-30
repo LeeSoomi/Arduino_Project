@@ -73,19 +73,19 @@ void loop() {
   
   int lightLevel = analogRead(LIGHT_SENSOR_PIN);
   int soilMoisture = analogRead(SOIL_SENSOR_PIN);
-  float temperature = dht.readTemperature();
-  float humidity = dht.readHumidity();
+  float temp = dht.readTemperature();
+  float hum = dht.readHumidity();
   
   light_level = lightLevel;
   soil_moisture = soilMoisture;
-  temperature = temperature;
-  humidity = humidity;
+  temperature = temp;
+  humidity = hum;
   
   controlNeoPixel(lightLevel);
   controlPump(soilMoisture);
-  controlFan(temperature);
+  controlFan(temp);
   
-  displaySensorData(lightLevel, soilMoisture, temperature, humidity);
+  displaySensorData(lightLevel, soilMoisture, temp, hum);
 }
 
 void controlNeoPixel(int lightLevel) {
