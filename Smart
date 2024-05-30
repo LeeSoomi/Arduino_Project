@@ -10,6 +10,8 @@
   float temperature;
   int light_level;
   int soil_moisture;
+  bool pump_status;
+  bool fan_status;
 
   Variables which are marked as READ/WRITE in the Cloud Thing will also have functions
   which are called when their values are changed from the Dashboard.
@@ -101,16 +103,20 @@ void controlNeoPixel(int lightLevel) {
 void controlPump(int soilMoisture) {
   if (soilMoisture < 300) {
     digitalWrite(PUMP_PIN, HIGH);
+    pump_status = true;
   } else {
     digitalWrite(PUMP_PIN, LOW);
+    pump_status = false;
   }
 }
 
 void controlFan(float temperature) {
   if (temperature > 25.0) {
     digitalWrite(FAN_PIN, HIGH);
+    fan_status = true;
   } else {
     digitalWrite(FAN_PIN, LOW);
+    fan_status = false;
   }
 }
 
@@ -136,6 +142,14 @@ void displaySensorData(int light, int soil, float temp, float hum) {
   display.print("Humidity: ");
   display.print(hum);
   display.print(" %");
+  
+  display.setCursor(0, 40);
+  display.print("Pump: ");
+  display.print(pump_status ? "On" : "Off");
+  
+  display.setCursor(0, 50);
+  display.print("Fan: ");
+  display.print(fan_status ? "On" : "Off");
 
   display.display();
 }
