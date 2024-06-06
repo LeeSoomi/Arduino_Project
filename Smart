@@ -35,11 +35,15 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 #define DHT_PIN 2
 #define DHT_TYPE DHT11
 
-#define NEOPIXEL_PIN 6
-#define NUMPIXELS 1
+#define NEOPIXEL_PIN 3
+#define NUMPIXELS 21  // 네오픽셀 LED 개수
 
-#define PUMP_PIN 3
-#define FAN_PIN 4
+#define MOTOR1_ENA 5
+#define MOTOR1_IN1 6
+#define MOTOR1_IN2 7
+#define MOTOR2_ENB 8
+#define MOTOR2_IN3 9
+#define MOTOR2_IN4 10
 
 DHT dht(DHT_PIN, DHT_TYPE);
 Adafruit_NeoPixel pixels(NUMPIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
@@ -50,8 +54,12 @@ void setup() {
 
   pinMode(LIGHT_SENSOR_PIN, INPUT);
   pinMode(SOIL_SENSOR_PIN, INPUT);
-  pinMode(PUMP_PIN, OUTPUT);
-  pinMode(FAN_PIN, OUTPUT);
+  pinMode(MOTOR1_ENA, OUTPUT);
+  pinMode(MOTOR1_IN1, OUTPUT);
+  pinMode(MOTOR1_IN2, OUTPUT);
+  pinMode(MOTOR2_ENB, OUTPUT);
+  pinMode(MOTOR2_IN3, OUTPUT);
+  pinMode(MOTOR2_IN4, OUTPUT);
 
   dht.begin();
   pixels.begin();
@@ -91,31 +99,51 @@ void loop() {
 }
 
 void controlNeoPixel(int lightLevel) {
-  if (lightLevel < 500) {
+  if (lightLevel > 500) {
     // Set to growth light spectrum: mostly red with some blue
-    pixels.setPixelColor(0, pixels.Color(255, 0, 255)); // Purple (Red + Blue)
+    for (int i = 0; i < NUMPIXELS; i++) {
+      pixels.setPixelColor(i, pixels.Color(255, 0, 255)); // Purple (Red + Blue)
+    }
   } else {
-    pixels.setPixelColor(0, pixels.Color(0, 0, 0)); // Turn off if light level is sufficient
+    for (int i = 0; i < NUMPIXELS; i++) {
+      pixels.setPixelColor(i, pixels.Color(0, 0, 0)); // Turn off if light level is sufficient
+    }
   }
   pixels.show();
 }
 
 void controlPump(int soilMoisture) {
   if (soilMoisture < 300) {
-    digitalWrite(PUMP_PIN, HIGH);
+    // Motor 1 forward
+    digitalWrite(MOTOR1_IN1, HIGH);
+    digitalWrite(MOTOR1_IN2, LOW);
+    analogWrite(MOTOR1_ENA, 200); // Full speed
+    Serial.println("Pump ON");
     pump_status = true;
   } else {
-    digitalWrite(PUMP_PIN, LOW);
+    // Motor 1 stop
+    digitalWrite(MOTOR1_IN1, LOW);
+    digitalWrite(MOTOR1_IN2, LOW);
+    analogWrite(MOTOR1_ENA, 0); // Stop
+    Serial.println("Pump OFF");
     pump_status = false;
   }
 }
 
 void controlFan(float temperature) {
-  if (temperature > 25.0) {
-    digitalWrite(FAN_PIN, HIGH);
+  if (temperature > 28.0) {
+    // Motor 2 forward
+    digitalWrite(MOTOR2_IN3, HIGH);
+    digitalWrite(MOTOR2_IN4, LOW);
+    analogWrite(MOTOR2_ENB, 255); // Full speed
+    Serial.println("Fan ON");
     fan_status = true;
   } else {
-    digitalWrite(FAN_PIN, LOW);
+    // Motor 2 stop
+    digitalWrite(MOTOR2_IN3, LOW);
+    digitalWrite(MOTOR2_IN4, LOW);
+    analogWrite(MOTOR2_ENB, 0); // Stop
+    Serial.println("Fan OFF");
     fan_status = false;
   }
 }
@@ -168,12 +196,4 @@ void onTemperatureChange() {
 
 void onHumidityChange() {
   // handle change
-}
-
-void onPumpStatusChange(){
-  
-}
-
-void onFanStatusChange(){
-  
 }
