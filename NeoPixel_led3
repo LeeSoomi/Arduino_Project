@@ -1,0 +1,56 @@
+#include <Adafruit_NeoPixel.h>
+#ifdef __AVR__
+#include <avr/power.h>
+#endif
+
+#define PIN 6
+#define NUMPIXELS 3
+#define DELAYVAL 5000
+
+Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
+
+long interval_red = 10000;
+long interval_green = 15000;
+long interval_yellow = 3000;  // 노란불 3초
+
+long previousMillis = 0;
+
+void setup() {
+  #if defined(__AVR_ATtiny85__) && (F_CPU == 16000000)
+    clock_prescale_set(clock_div_1);
+  #endif
+  pixels.begin();
+  pixels.clear();
+  pixels.show();
+  delay(1000);
+}
+
+void loop() {
+  unsigned long currentMillis = millis();
+  unsigned long elapsed = currentMillis - previousMillis;
+
+  if( currentMillis - previousMillis <= interval_red ) {
+    pixels.setPixelColor(0, pixels.Color(0, 0, 0));
+    pixels.setPixelColor(1, pixels.Color(0, 0, 0));
+    pixels.setPixelColor(2, pixels.Color(150, 0, 0));
+    pixels.show();
+  }
+  else if( currentMillis - previousMillis > interval_red && currentMillis - previousMillis <= interval_green ) {
+    pixels.setPixelColor(0, pixels.Color(0, 0, 0));
+    pixels.setPixelColor(1, pixels.Color(0, 150, 0));
+    pixels.setPixelColor(2, pixels.Color(0, 0, 0));
+    pixels.show();
+    if (elapsed > (interval_green - interval_yellow) && elapsed <= interval_green) {
+      // 노란불: 같은 픽셀에서 R+G 켜기 (여기선 0번 픽셀을 노란불로 사용)
+      pixels.setPixelColor(0, pixels.Color(150, 150, 0));
+      pixels.setPixelColor(1, pixels.Color(0, 0, 0));
+      pixels.setPixelColor(2, pixels.Color(0, 0, 0));
+      pixels.show();
+    }
+  }
+
+
+  else if (currentMillis - previousMillis > interval_green){
+    previousMillis = currentMillis;
+  }
+}
