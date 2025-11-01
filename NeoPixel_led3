@@ -30,20 +30,20 @@ void loop() {
   unsigned long elapsed = currentMillis - previousMillis;
 
   if( currentMillis - previousMillis <= interval_red ) {
-    pixels.setPixelColor(0, pixels.Color(0, 0, 0));
+    pixels.setPixelColor(0, pixels.Color(200, 0, 0));
     pixels.setPixelColor(1, pixels.Color(0, 0, 0));
-    pixels.setPixelColor(2, pixels.Color(150, 0, 0));
+    pixels.setPixelColor(2, pixels.Color(2, 0, 0));
     pixels.show();
   }
   else if( currentMillis - previousMillis > interval_red && currentMillis - previousMillis <= interval_green ) {
     pixels.setPixelColor(0, pixels.Color(0, 0, 0));
-    pixels.setPixelColor(1, pixels.Color(0, 150, 0));
-    pixels.setPixelColor(2, pixels.Color(0, 0, 0));
+    pixels.setPixelColor(1, pixels.Color(0, 0, 0));
+    pixels.setPixelColor(2, pixels.Color(0, 200, 0));
     pixels.show();
     if (elapsed > (interval_green - interval_yellow) && elapsed <= interval_green) {
-      // 노란불: 같은 픽셀에서 R+G 켜기 (여기선 0번 픽셀을 노란불로 사용)
-      pixels.setPixelColor(0, pixels.Color(150, 150, 0));
-      pixels.setPixelColor(1, pixels.Color(0, 0, 0));
+      // 노란불: 같은 픽셀에서 R+G 켜기 (여기선 1번 픽셀을 노란불로 사용)
+      pixels.setPixelColor(0, pixels.Color(0, 0, 0));
+      pixels.setPixelColor(1, pixels.Color(200, 200, 0));
       pixels.setPixelColor(2, pixels.Color(0, 0, 0));
       pixels.show();
     }
