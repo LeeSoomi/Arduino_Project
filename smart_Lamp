@@ -1,0 +1,117 @@
+#include "HUSKYLENS.h"
+#include <Adafruit_NeoPixel.h>
+#ifdef __AVR__
+#include <avr/power.h>
+#endif
+
+#define PIN 6
+#define NUMPIXELS 3
+
+Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
+
+long interval_red   = 10000;   // 빨간불 유지 시간 (0~10초)
+long interval_green = 15000;   // 전체 사이클 끝 시간 (10~15초, 그 이후 리셋)
+unsigned long previousMillis = 0;
+
+HUSKYLENS huskylens;
+
+// 사람 인식 상태 관리
+bool personDetected = false;
+unsigned long personDetectedTime = 0;
+long yellowDuration = 3000; // 노란불 유지 시간 3초
+
+void setup() {
+  Serial.begin(115200);
+  Wire.begin();
+
+  while (!huskylens.begin(Wire)) {
+    Serial.println(F("Begin failed!"));
+    Serial.println(F("1.Please recheck the \"Protocol Type\" in HUSKYLENS (General Settings>>Protocol Type>>I2C)"));
+    Serial.println(F("2.Please recheck the connection."));
+    delay(100);
+  }
+
+  pixels.begin();
+  pixels.clear();
+  pixels.show();
+  delay(1000);
+}
+
+void loop() {
+  // 1. HUSKYLENS에서 사람 인식 여부 확인
+  if (!huskylens.request()) {
+    Serial.println(F("Fail to request data from HUSKYLENS, recheck the connection!"));
+  } else {
+    bool detectedThisFrame = false;
+
+    while (huskylens.available()) {
+      HUSKYLENSResult result = huskylens.read();
+      if (result.command == COMMAND_RETURN_BLOCK) {
+        if (result.ID == 1) {  // ID 1번을 '사람'으로 학습했다고 가정
+          detectedThisFrame = true;
+        }
+      }
+    }
+
+    // 이번 프레임에서 사람을 처음 인식한 순간만 트리거
+    if (detectedThisFrame && !personDetected) {
+      personDetected = true;
+      personDetectedTime = millis();
+      Serial.println("Person detected - yellow then red!");
+    }
+  }
+
+  // 2. 신호등 제어 (사람 감지 상태 포함)
+  signalLamp();
+}
+
+void signalLamp() {
+  unsigned long currentMillis = millis();
+
+  // 사람 인식 시 : 노란 → 빨간 우선 시퀀스
+  if (personDetected) {
+    unsigned long elapsedSinceDetect = currentMillis - personDetectedTime;
+
+    if (elapsedSinceDetect < yellowDuration) {
+      // 노란불만 켜기 (0번 픽셀)
+      pixels.setPixelColor(0, pixels.Color(150, 150, 0)); // 노랑
+      pixels.setPixelColor(1, pixels.Color(0, 0, 0));     // 초록 꺼짐
+      pixels.setPixelColor(2, pixels.Color(0, 0, 0));     // 빨강 꺼짐
+    } else {
+      // 노란불 이후 빨간불로 전환
+      pixels.setPixelColor(0, pixels.Color(0, 0, 0));     // 노랑 꺼짐
+      pixels.setPixelColor(1, pixels.Color(0, 0, 0));     // 초록 꺼짐
+      pixels.setPixelColor(2, pixels.Color(150, 0, 0));   // 빨강 켜짐
+
+      // 여기서부터는 다시 기본 사이클로 돌아가도록 초기화
+      previousMillis = currentMillis; // 빨간불 시작 시점으로 맞추기
+      personDetected = false;
+    }
+
+    pixels.show();
+    return; // 사람 인식 시에는 기본 사이클 스킵
+  }
+
+  // === 기본 신호등 사이클 ===
+  unsigned long elapsed = currentMillis - previousMillis;
+  Serial.println(elapsed);
+
+  if (elapsed <= interval_red) {
+    // 빨간불 구간 (0~10초)
+    pixels.setPixelColor(0, pixels.Color(0, 0, 0));     // 노랑 꺼짐
+    pixels.setPixelColor(1, pixels.Color(0, 0, 0));     // 초록 꺼짐
+    pixels.setPixelColor(2, pixels.Color(150, 0, 0));   // 빨강 켜짐
+  }
+  else if (elapsed > interval_red && elapsed <= interval_green) {
+    // 초록불 구간 (10~15초)
+    pixels.setPixelColor(0, pixels.Color(0, 0, 0));     // 노랑 꺼짐
+    pixels.setPixelColor(1, pixels.Color(0, 150, 0));   // 초록 켜짐
+    pixels.setPixelColor(2, pixels.Color(0, 0, 0));     // 빨강 꺼짐
+  }
+  else if (elapsed > interval_green) {
+    // 사이클 리셋
+    previousMillis = currentMillis;
+  }
+
+  pixels.show();
+}
