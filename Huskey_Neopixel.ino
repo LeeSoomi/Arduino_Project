@@ -13,6 +13,10 @@ unsigned long interval_red = 10000;
 unsigned long interval_green = 15000;
 unsigned long previousMillis = 0;
 
+unsigned long yellowHoldTime = 3000;      // 노란불 최소 유지 시간(ms)
+unsigned long yellowStartMillis = 0;      // 노란불 시작 시간
+bool yellowHolding = false;              // 노란불 유지 중인지
+
 HUSKYLENS huskylens;
 
 void setup() {
@@ -44,9 +48,7 @@ bool detectPersonID1() {
     HUSKYLENSResult result = huskylens.read();
 
     if (result.command == COMMAND_RETURN_BLOCK) {
-      if (result.ID == 1) {
-        detected = true;
-      }
+      if (result.ID == 1) detected = true;
     }
   }
 
@@ -65,8 +67,6 @@ void showSignalLamp() {
   unsigned long currentMillis = millis();
   unsigned long elapsed = currentMillis - previousMillis;
 
-  Serial.println(currentMillis);
-
   if (elapsed <= interval_red) {
     pixels.clear();
     pixels.setPixelColor(2, pixels.Color(150, 0, 0)); // 빨강
@@ -83,13 +83,33 @@ void showSignalLamp() {
 }
 
 void loop() {
+  unsigned long now = millis();
   bool personDetected = detectPersonID1();
 
+  // 사람이 감지되면 노란불 상태 시작 또는 유지
   if (personDetected) {
-    Serial.println("Detect Person!");
+    if (!yellowHolding) {
+      yellowHolding = true;
+      yellowStartMillis = now;   // 노란불 시작 시간 기록
+    }
     showYellowOnly();
-  } else {
-    Serial.println("No Person!");
-    showSignalLamp();
+    Serial.println("Detect Person!");
+    return;
   }
+
+  // 사람이 더 이상 감지되지 않더라도,
+  // 노란불은 yellowHoldTime 동안은 계속 유지
+  if (yellowHolding) {
+    if (now - yellowStartMillis < yellowHoldTime) {
+      showYellowOnly();
+      Serial.println("Yellow holding...");
+      return;
+    } else {
+      yellowHolding = false;  // 유지시간 끝나면 해제
+    }
+  }
+
+  // 노란불 유지조건이 끝나면 일반 신호등 모드
+  Serial.println("No Person!");
+  showSignalLamp();
 }
